@@ -3,8 +3,9 @@ import { logger } from "./logger";
 
 const redis = new RedisClient(process.env.REDIS_URL);
 
-process.on("SIGTERM", async () => {
+process.on("SIGTERM", () => {
   redis.close();
+  process.exit(0);
 });
 
 await redis.connect();
