@@ -3,30 +3,41 @@ import { logger } from "./logger";
 
 const redis = new RedisClient(process.env.REDIS_HOST);
 
-Bun.serve({
+await redis.connect();
+
+process.on("SIGTERM", async () => {
+  redis.close();
+});
+
+const server = Bun.serve({
   port: 9121,
   routes: {
     "/metrics": async (request, server) => {
-      const body = [
-        "# HELP redis_queue_length Number of jobs in the queue",
-        "# TYPE redis_queue_length guage",
-      ];
+      try {
+        const body = [
+          "# HELP redis_queue_length Number of jobs in the queue",
+          "# TYPE redis_queue_length guage",
+        ];
 
-      const keys = await redis.keys("*");
+        const keys = await redis.keys("*");
 
-      for (const key of keys) {
-        const type = await redis.type(key);
+        for (const key of keys) {
+          const type = await redis.type(key);
 
-        if (type === "list") {
-          const count = await redis.llen(key);
-          body.push(`redis_queue_length{queue="${key}"} ${count}`);
+          if (type === "list") {
+            const count = await redis.llen(key);
+            body.push(`redis_queue_length{queue="${key}"} ${count}`);
+          }
         }
-      }
 
-      return new Response(body.join("\n"), {
-        status: 200,
-        headers: { "Content-Type": "text/plain; version=0.0.4" },
-      });
+        return new Response(body.join("\n"), {
+          status: 200,
+          headers: { "Content-Type": "text/plain; version=0.0.4" },
+        });
+      } catch (error) {
+        logger.error("Error occurred getting metrics", { error });
+        return new Response("Internal Error", { status: 500 });
+      }
     },
   },
   fetch() {
@@ -34,3 +45,5 @@ Bun.serve({
     return new Response("Not Found", { status: 404 });
   },
 });
+
+logger.info(`Server listening at: ${server.url}`);
