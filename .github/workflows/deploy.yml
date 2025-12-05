@@ -34,4 +34,4 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: charlesjones88/redis-exporter:latest,charlesjones88/redis-exporter:${{ github.sha }}
+          tags: ghcr.io/charlesjones88/redis-exporter:latest,ghcr.io/charlesjones88/redis-exporter:${{ github.sha }}
