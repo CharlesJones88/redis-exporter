@@ -1,7 +1,7 @@
 import { RedisClient } from "bun";
 import { logger } from "./logger";
 
-const redis = new RedisClient(process.env.REDIS_HOST);
+const redis = new RedisClient(process.env.REDIS_URL);
 
 await redis.connect();
 
