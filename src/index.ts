@@ -3,12 +3,6 @@ import { logger } from "./logger";
 
 const redis = new RedisClient(process.env.REDIS_URL);
 
-await redis.connect();
-
-process.on("SIGTERM", async () => {
-  redis.close();
-});
-
 const server = Bun.serve({
   port: 9121,
   routes: {
@@ -46,4 +40,9 @@ const server = Bun.serve({
   },
 });
 
+await redis.connect();
 logger.info(`Server listening at: ${server.url}`);
+
+process.on("SIGTERM", async () => {
+  redis.close();
+});
