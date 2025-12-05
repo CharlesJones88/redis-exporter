@@ -3,6 +3,12 @@ import { logger } from "./logger";
 
 const redis = new RedisClient(process.env.REDIS_URL);
 
+process.on("SIGTERM", async () => {
+  redis.close();
+});
+
+await redis.connect();
+
 const server = Bun.serve({
   port: 9121,
   routes: {
@@ -10,7 +16,7 @@ const server = Bun.serve({
       try {
         const body = [
           "# HELP redis_queue_length Number of jobs in the queue",
-          "# TYPE redis_queue_length guage",
+          "# TYPE redis_queue_length gauge",
         ];
 
         const keys = await redis.keys("*");
@@ -40,9 +46,4 @@ const server = Bun.serve({
   },
 });
 
-await redis.connect();
 logger.info(`Server listening at: ${server.url}`);
-
-process.on("SIGTERM", async () => {
-  redis.close();
-});
