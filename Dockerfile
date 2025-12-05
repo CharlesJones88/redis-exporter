@@ -7,7 +7,7 @@ FROM base AS install
 RUN mkdir -p /tmp/app
 COPY package.json bun.lock /tmp/app/
 
-RUN bun install --frozen-lockfile --production
+RUN cd /tmp/app && bun install --frozen-lockfile --production
 
 FROM base AS release
 COPY --from=install /tmp/app/node_modules node_modules
