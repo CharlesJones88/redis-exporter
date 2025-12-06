@@ -15,6 +15,7 @@ const server = Bun.serve({
   routes: {
     "/metrics": async (request, server) => {
       try {
+        logger.info("Fetching metrics");
         const body = [
           "# HELP redis_queue_length Number of jobs in the queue",
           "# TYPE redis_queue_length gauge",
@@ -27,6 +28,7 @@ const server = Bun.serve({
 
           if (type === "list") {
             const count = await redis.llen(key);
+            logger.info(`${key} has ${count} items`);
             body.push(`redis_queue_length{queue="${key}"} ${count}`);
           }
         }
