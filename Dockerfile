@@ -13,7 +13,6 @@ FROM base AS release
 COPY --from=install /tmp/app/node_modules node_modules
 COPY src src
 
-LABEL loki_exclude="true"
 RUN groupadd -g 3000 docker && usermod -aG docker bun && newgrp docker
 USER bun
 EXPOSE 9121/tcp
