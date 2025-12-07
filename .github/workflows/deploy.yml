@@ -65,5 +65,7 @@ jobs:
             -H 'Content-Type: application/json' \
             -H 'x-api-key: ${{ secrets.DOKPLOY_AUTH_TOKEN }}' \
             -d '{
-              "composeId": "${{ secrets.APP_ID }}"
+              "composeId": "${{ secrets.APP_ID }}",
+              "title": "${{ github.sha }}",
+              "description": "${{ github.event.head_commit.message }}"
             }'
