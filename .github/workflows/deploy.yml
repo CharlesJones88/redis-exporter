@@ -36,7 +36,28 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ghcr.io/charlesjones88/redis-exporter:latest,ghcr.io/charlesjones88/redis-exporter:${{ github.sha }}
 
-        # Maybe need to download the image first
+      - name: Start SSH agent and add deploy key
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_DEPLOY_KEY }}
+
+      - name: Pull latest image
+        env:
+          IMAGE: ghcr.io/${{ github.repository }}:latest
+          NODES: ${{ vars.NODES }}
+        run: |
+          for node in $(echo "$NODES" | jq -r '.[] | @base64'); do
+            _jq() {
+              echo "${node}" | base64 --decode | jq -r ${1}
+            }
+            echo "--- Running on $node ---"
+            (
+              ssh -o StrictHostKeyChecking=no "$(_jq '.username')@$(_jq '.host')" "export GHCR_USERNAME='${{ github.actor }}' GHCR_TOKEN='${{ secrets.GITHUB_TOKEN }}' IMAGE='${{ env.IMAGE }}'; bash -s" < ./pull.sh
+            ) &
+          done
+
+          wait
+
       - name: Deploy
         run: |
           curl -X POST ${{ secrets.DOKPLOY_URL }}/api/compose.deploy \
