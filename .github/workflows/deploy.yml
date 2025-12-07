@@ -52,7 +52,7 @@ jobs:
             }
             echo "--- Running on $node ---"
             (
-              ssh -o StrictHostKeyChecking=no "$(_jq '.username')@$(_jq '.host')" "export GHCR_USERNAME='${{ github.actor }}' GHCR_TOKEN='${{ secrets.GITHUB_TOKEN }}' IMAGE='${{ env.IMAGE }}'; bash -s" < ./pull.sh
+              ssh -o StrictHostKeyChecking=no "$(_jq '.username')@$(_jq '.host')" "export GHCR_USERNAME='${{ github.actor }}' GHCR_TOKEN='${{ secrets.GITHUB_TOKEN }}' IMAGE='${IMAGE@L}'; bash -s" < ./pull.sh
             ) &
           done
 
