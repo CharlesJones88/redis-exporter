@@ -13,7 +13,7 @@ await redis.connect();
 const server = Bun.serve({
   port: 9121,
   routes: {
-    "/metrics": async (request, server) => {
+    "/metrics": async () => {
       try {
         logger.info("Fetching metrics");
         const body = [
@@ -23,8 +23,13 @@ const server = Bun.serve({
 
         const keys = await redis.keys("*");
 
+        if (keys.length === 0) {
+          body.push('redis_queue_length 0')
+        }
+
         for (const key of keys) {
           const type = await redis.type(key);
+          logger.info(`Found key: ${key} with type: ${type}`);
 
           if (type === "list") {
             const count = await redis.llen(key);
