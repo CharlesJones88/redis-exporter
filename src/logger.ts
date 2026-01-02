@@ -1,7 +1,14 @@
-import { Levels, Logger } from "@rabbit-company/logger";
+import { pino } from 'pino';
+const { LEVEL = 'INFO' } = process.env;
 
-const { LEVEL = "INFO" } = process.env;
-
-export const logger = new Logger({
-  level: Levels[LEVEL as keyof typeof Levels],
+export const logger = pino({
+  level: LEVEL,
+  messageKey: 'message',
+  formatters: {
+    level(label) {
+      return {
+        level: label.toUpperCase(),
+      };
+    },
+  },
 });
