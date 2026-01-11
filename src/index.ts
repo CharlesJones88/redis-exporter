@@ -41,7 +41,7 @@ const server = Bun.serve({
           headers: { "Content-Type": "text/plain; version=0.0.4" },
         });
       } catch (error) {
-        logger.error({ error }, "Error occurred getting metrics");
+        logger.error(error, "Error occurred getting metrics");
         return new Response("Internal Error", { status: 500 });
       }
     },
