@@ -1,6 +1,7 @@
 name: 'Deploy redis_exporter'
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
